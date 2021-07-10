@@ -1,7 +1,27 @@
 const express = require('express');
+const User = require('./users/model');
 
 const server = express();
 
-server.use(express.json())
+server.use(express.json());
 
-module.exports = {}; // EXPORT YOUR SERVER instead of {}
+server.post('/api/users', (req, res) => {
+    if (!req.body.name || !req.body.bio){
+        res.status(400).json({message: 'Please provide name and bio for the user'})
+    } else {
+        const { name, bio } = req.body
+
+        User.insert({name, bio})
+            .then(user => {
+                console.log(user)
+                res.status(201).json(user)
+            })
+            .catch(err => {
+                res.status(500).json({
+                    message: err.message
+                })
+            })
+    }
+});
+
+module.exports = server; // EXPORT YOUR SERVER instead of {}
